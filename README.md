@@ -9,17 +9,20 @@ This is an attempt to learn to develop a functional paradigm application using e
 
 ## Find the behaviours
 **User** *creates* **Activities**
-    - Weekly time goal
-    - Activity name
+
+- Weekly time goal
+- Activity name
 
 **User** *logs time against an* **Activity**
-    - Log distinct time amount *retroactively*
-    - Start and stop event for logging time
+
+- Log distinct time amount *retroactively*
+- Start and stop event for logging time
 
 **User** *removes* an **Activity**
 **User** *views activity progress* towards **Activity** time goal
 **User** *updates* **Activity**
-    - Change goal or change name
+    
+- Change goal or change name
 **User** *updates* **User**
 
 ## Create the contracts
