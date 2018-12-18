@@ -3,11 +3,11 @@ This is an attempt to learn to develop a functional paradigm application using e
 
 # Modelling the domain
 
-## Find the aggregates
+### Find the aggregates
 - **Activity**
 - **User**
 
-## Find the behaviours
+### Find the behaviours
 **User** *creates* **Activities**
 
 - Weekly time goal
@@ -25,5 +25,7 @@ This is an attempt to learn to develop a functional paradigm application using e
 - Change goal or change name
 **User** *updates* **User**
 
-## Create the contracts
+### Create the contracts
 **Turn behaviours into commands and events (code)**
+
+### Determine the business rules
