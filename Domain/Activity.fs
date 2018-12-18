@@ -3,15 +3,20 @@ module Domain.Activity
 open Messages.Activities
 open Messages.Users
 open NodaTime
+open NodaTime
+open NodaTime
 open System
 
 type State = {
     Name: string
     Goal: Duration
-    TotalTime: Duration option
+    TotalTime: int option
     CreatedAt: Instant
     Deleted: bool
     DeletedAt: Instant option
+    UpdatedAt: Instant option
+    CurrentlyLoggingTime: bool
+    StartedLoggingAt: Instant option
 }
 
 // Create Activity
@@ -22,10 +27,13 @@ let applyActivityCreated (state: State) (event: ActivityCreated) =
     {
         Name = event.Name
         Goal = event.Goal
-        TotalTime = None
+        TotalTime = Some 0
         CreatedAt = event.CreatedAt
         Deleted = false
         DeletedAt = None
+        UpdatedAt = None
+        CurrentlyLoggingTime = false
+        StartedLoggingAt = None
     }
 
 // Update Goal
@@ -33,21 +41,28 @@ let execUpdateGoal (state: State) (command: UpdateActivityGoal) =
     raise <| NotImplementedException ()
     
 let applyActivityGoalUpdate (state: State) (event: ActivityGoalUpdated) =
-    raise <| NotImplementedException ()
+    { state with
+        Goal = event.Goal
+    }
 
 // Update Name
 let execUpdateName (state: State) (command: UpdateActivityName) =
     raise <| NotImplementedException ()
     
 let applyActivityNameUpdate (state: State) (event: ActivityNameUpdated) =
-    raise <| NotImplementedException ()
+    { state with
+        Name = event.Name
+        UpdatedAt = Some event.UpdatedAt
+    }
 
 // Log Time
 let execLogTime (state: State) (command: LogTime) =
     raise <| NotImplementedException ()
 
 let applyTimeLogged (state: State) (event: TimeLogged) =
-    raise <| NotImplementedException ()
+    match state.TotalTime with
+    | None -> { state with TotalTime = Some event.Duration.Seconds }
+    | Some t -> { state with TotalTime = Some (t + event.Duration.Seconds)}
 
 // Start Time Logging
 let execStartTimeLogging (state: State) (command: StartTimeLogging) =
