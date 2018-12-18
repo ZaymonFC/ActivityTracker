@@ -5,11 +5,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Activity.fs" />
+        <Compile Include="Aggregate.fs" />
         <Compile Include="Library.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="NodaTime" Version="2.4.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Messages\Messages.fsproj" />
     </ItemGroup>
 
 </Project>

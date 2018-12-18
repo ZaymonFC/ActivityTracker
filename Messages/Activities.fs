@@ -5,7 +5,20 @@ open NodaTime
 type CreateActivity =
     { 
         Name: string
-        CreateAt: Instant 
+        CreateAt: Instant
+        Goal: Duration
+    }
+
+type UpdateActivityGoal =
+    {
+        Goal: Duration
+        UpdateAt: Instant
+    }
+
+type UpdateActivityName =
+    {
+        Name: string
+        UpdatedAt: Instant
     }
 
 type LogTime =
@@ -31,6 +44,8 @@ type DeleteActivity =
 
 type ActivityCommand =
     | CreateActivity of CreateActivity
+    | UpdateActivityGoal of UpdateActivityGoal
+    | UpdateActivityName of UpdateActivityName
     | LogTime of LogTime
     | StartTimeLogging of StartTimeLogging
     | EndTimeLogging of EndTimeLogging
@@ -38,8 +53,22 @@ type ActivityCommand =
 
 
 type ActivityCreated =
-    { 
+    {
+        Name: string
+        Goal: Duration
         CreatedAt: Instant
+    }
+    
+type ActivityGoalUpdated =
+    {
+        Goal: Duration
+        UpdatedAt: Instant
+    }
+
+type ActivityNameUpdated =
+    {
+        Name: string
+        UpdatedAt: Instant
     }
 
 type TimeLogged =
@@ -65,6 +94,8 @@ type ActivityDeleted =
 
 type ActivityEvent =
     | ActivityCreated of ActivityCreated
+    | ActivityGoalUpdated of ActivityGoalUpdated
+    | ActivityNameUpdated of ActivityNameUpdated
     | TimeLogged of TimeLogged
     | StartedLoggingTime of StartedLoggingTime
     | EndedLoggingTime of EndedLoggingTime
