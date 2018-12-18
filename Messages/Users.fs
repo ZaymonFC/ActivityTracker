@@ -1,4 +1,4 @@
-module Messages.Users
+namespace Messages.Users
 open NodaTime
 
 type CreateUser =

@@ -1,8 +1,6 @@
 namespace Messages.Activities
-
 open System
 open NodaTime
-
 
 type CreateActivity =
     { 
