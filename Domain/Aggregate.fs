@@ -10,7 +10,7 @@ type Aggregate<'TState, 'TCommand, 'TEvent> =
 
 type Id = Guid
 
-let MakeHandler (aggregate: Aggregate<'TState, 'TCommand, 'TEvent>) (load: Id -> 'TEvent seq) (commit: Id * int -> 'TEvent -> unit) =
+let MakeAggregateRunner (aggregate: Aggregate<'TState, 'TCommand, 'TEvent>) (load: Id -> 'TEvent seq) (commit: Id * int -> 'TEvent -> unit) =
     fun (id, version) command ->
         let state = load id |> Seq.fold aggregate.Apply aggregate.Zero
         // Todo Write handling for idempotency (Map all command id's from meta data into seq and then check command ID)

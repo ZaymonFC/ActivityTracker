@@ -15,7 +15,6 @@ type State = {
     Deleted: bool
     DeletedAt: Instant option
     UpdatedAt: Instant option
-    CurrentlyLoggingTime: bool
     StartedLoggingAt: Instant option
 }
 
@@ -32,7 +31,6 @@ let applyActivityCreated (state: State) (event: ActivityCreated) =
         Deleted = false
         DeletedAt = None
         UpdatedAt = None
-        CurrentlyLoggingTime = false
         StartedLoggingAt = None
     }
 
@@ -69,21 +67,29 @@ let execStartTimeLogging (state: State) (command: StartTimeLogging) =
     raise <| NotImplementedException ()
     
 let applyStartedLoggingTime (state: State) (event: StartedLoggingTime) =
-    raise <| NotImplementedException ()
+    { state with
+        StartedLoggingAt = Some event.StartedAt
+    }
 
 // End Time Logging
 let execEndTimeLogging (state: State) (command: EndTimeLogging) =
     raise <| NotImplementedException ()
     
 let applyEndedLoggingTime (state: State) (event: EndedLoggingTime) =
-    raise <| NotImplementedException ()
+    match state.TotalTime, state.StartedLoggingAt with
+    | Some t, Some s -> { state with TotalTime = Some (t + (event.EndedAt - s).Seconds) }
+    | None, Some s -> { state with TotalTime = Some (event.EndedAt - s).Seconds }
+    | _ -> state
 
 // Delete Activity
 let execActivityDelete (state: State) (command: DeleteActivity) =
     raise <| NotImplementedException ()
 
 let applyActivityDeleted (state: State) (event: ActivityDeleted) =
-    raise <| NotImplementedException ()
+    { state with
+        Deleted = true
+        DeletedAt = Some event.DeletedAt
+    }
 
 
 let exec (state: State) (command: ActivityCommand) =
