@@ -1,5 +1,6 @@
 module Domain.Activity
 
+open Library.OptionExtensions
 open Messages.Activities
 open Messages.Users
 open NodaTime
@@ -76,11 +77,13 @@ let execEndTimeLogging (state: State) (command: EndTimeLogging) =
     raise <| NotImplementedException ()
     
 let applyEndedLoggingTime (state: State) (event: EndedLoggingTime) =
-    match state.TotalTime, state.StartedLoggingAt with
-    | Some t, Some s -> { state with TotalTime = Some (t + (event.EndedAt - s).Seconds) }
-    | None, Some s -> { state with TotalTime = Some (event.EndedAt - s).Seconds }
-    | _ -> state
-
+    let newTotal = optional {
+        let! s = state.StartedLoggingAt
+        let! t = state.TotalTime
+        return t + (event.EndedAt - s).Seconds
+    }
+    { state with TotalTime = newTotal }
+    
 // Delete Activity
 let execActivityDelete (state: State) (command: DeleteActivity) =
     raise <| NotImplementedException ()
