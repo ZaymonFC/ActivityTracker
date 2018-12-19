@@ -2,13 +2,10 @@ module Domain.Activity
 
 open Library.OptionExtensions
 open Messages.Activities
-open Messages.Users
 open NodaTime
-open NodaTime
-open NodaTime
-open System
+open Domain.Aggregate
 
-type State = {
+type ActivityState = {
     Name: string
     Goal: Duration
     TotalTime: int option
@@ -20,10 +17,14 @@ type State = {
 }
 
 // Create Activity
-let execActivityCreate (state: State) (command: CreateActivity) =
-    raise <| NotImplementedException ()
+let execActivityCreate (command: CreateActivity) =
+    ActivityCreated {
+         Name = command.Name
+         Goal = command.Goal
+         CreatedAt = command.CreateAt
+    }
     
-let applyActivityCreated (state: State) (event: ActivityCreated) =
+let applyActivityCreated (event: ActivityCreated) =
     {
         Name = event.Name
         Goal = event.Goal
@@ -36,47 +37,66 @@ let applyActivityCreated (state: State) (event: ActivityCreated) =
     }
 
 // Update Goal
-let execUpdateGoal (state: State) (command: UpdateActivityGoal) =
-    raise <| NotImplementedException ()
+let execUpdateGoal (state: ActivityState) (command: UpdateActivityGoal) =
+    ActivityGoalUpdated {
+        Goal = command.Goal
+        UpdatedAt = command.UpdateAt
+    }
     
-let applyActivityGoalUpdate (state: State) (event: ActivityGoalUpdated) =
+let applyActivityGoalUpdate (state: ActivityState) (event: ActivityGoalUpdated) =
     { state with
         Goal = event.Goal
     }
 
 // Update Name
-let execUpdateName (state: State) (command: UpdateActivityName) =
-    raise <| NotImplementedException ()
+let execUpdateName (state: ActivityState) (command: UpdateActivityName) =
+    ActivityNameUpdated {
+        Name = command.Name
+        UpdatedAt = command.UpdatedAt
+    }
     
-let applyActivityNameUpdate (state: State) (event: ActivityNameUpdated) =
+let applyActivityNameUpdate (state: ActivityState) (event: ActivityNameUpdated) =
     { state with
         Name = event.Name
         UpdatedAt = Some event.UpdatedAt
     }
 
 // Log Time
-let execLogTime (state: State) (command: LogTime) =
-    raise <| NotImplementedException ()
+let execLogTime (state: ActivityState) (command: LogTime) =
+    TimeLogged {
+        Duration = command.Duration
+        DateLogged = command.LogAt
+    }
 
-let applyTimeLogged (state: State) (event: TimeLogged) =
+let applyTimeLogged (state: ActivityState) (event: TimeLogged) =
     match state.TotalTime with
     | None -> { state with TotalTime = Some event.Duration.Seconds }
     | Some t -> { state with TotalTime = Some (t + event.Duration.Seconds)}
 
 // Start Time Logging
-let execStartTimeLogging (state: State) (command: StartTimeLogging) =
-    raise <| NotImplementedException ()
+let execStartTimeLogging (state: ActivityState) (command: StartTimeLogging) =
+    StartedLoggingTime {
+        StartedAt = command.StartAt
+    }
     
-let applyStartedLoggingTime (state: State) (event: StartedLoggingTime) =
+let applyStartedLoggingTime (state: ActivityState) (event: StartedLoggingTime) =
     { state with
         StartedLoggingAt = Some event.StartedAt
     }
 
 // End Time Logging
-let execEndTimeLogging (state: State) (command: EndTimeLogging) =
-    raise <| NotImplementedException ()
-    
-let applyEndedLoggingTime (state: State) (event: EndedLoggingTime) =
+let execEndTimeLogging (state: ActivityState) (command: EndTimeLogging) =
+    match state.StartedLoggingAt with
+    | None -> failwith "Cannot finish logging time when logging never started." // TODO - Emit error event
+    | Some s ->
+        if command.EndAt.InUtc().Second - s.InUtc().Second < 0 then
+            failwith "Error -ve duration" // TODO - Emit error event
+        else
+            EndedLoggingTime {
+                EndedAt = command.EndAt
+            }
+
+let applyEndedLoggingTime (state: ActivityState) (event: EndedLoggingTime) =
     let newTotal = optional {
         let! s = state.StartedLoggingAt
         let! t = state.TotalTime
@@ -85,34 +105,56 @@ let applyEndedLoggingTime (state: State) (event: EndedLoggingTime) =
     { state with TotalTime = newTotal }
     
 // Delete Activity
-let execActivityDelete (state: State) (command: DeleteActivity) =
-    raise <| NotImplementedException ()
+let execActivityDelete (state: ActivityState) (command: DeleteActivity) =
+    ActivityDeleted {
+        DeletedAt = command.DeleteAt
+    }
 
-let applyActivityDeleted (state: State) (event: ActivityDeleted) =
+let applyActivityDeleted (state: ActivityState) (event: ActivityDeleted) =
     { state with
         Deleted = true
         DeletedAt = Some event.DeletedAt
     }
 
 
-let exec (state: State) (command: ActivityCommand) =
-    match command with
-    | CreateActivity c -> execActivityCreate state c
-    | UpdateActivityGoal c -> execUpdateGoal state c
-    | UpdateActivityName c -> execUpdateName state c
-    | LogTime c -> execLogTime state c
-    | StartTimeLogging c -> execStartTimeLogging state c
-    | EndTimeLogging c -> execEndTimeLogging state c
-    | DeleteActivity c -> execActivityDelete state c
+let exec (state: ActivityState option) (command: ActivityCommand) =
+    match state with
+    | None ->
+        match command with
+        | CreateActivity c -> execActivityCreate c
+        | _ -> failwithf "Attempted to fire %A with non-existent activity state" command
+    | Some state ->
+        match state.Deleted with
+        | true -> failwith "Cannot command deleted activity"
+        | _ ->
+            match command with
+            | UpdateActivityGoal c -> execUpdateGoal state c
+            | UpdateActivityName c -> execUpdateName state c
+            | LogTime c -> execLogTime state c
+            | StartTimeLogging c -> execStartTimeLogging state c
+            | EndTimeLogging c -> execEndTimeLogging state c
+            | DeleteActivity c -> execActivityDelete state c
+            | _ -> failwithf "The command %A is not applicable in this context" command
 
-let apply (state: State) (event: ActivityEvent) =
-    match event with
-    | ActivityCreated e -> applyActivityCreated state e
-    | ActivityGoalUpdated e -> applyActivityGoalUpdate state e
-    | ActivityNameUpdated e -> applyActivityNameUpdate state e
-    | TimeLogged e -> applyTimeLogged state e
-    | StartedLoggingTime e -> applyStartedLoggingTime state e
-    | EndedLoggingTime e -> applyEndedLoggingTime state e
-    | ActivityDeleted e -> applyActivityDeleted state e
+let apply (state: ActivityState option) (event: ActivityEvent) =
+    match state with
+    | None ->
+        match event with
+        | ActivityCreated e -> applyActivityCreated e |> Some
+        | _ -> None
+    | Some state ->
+        match event with
+        | ActivityGoalUpdated e -> applyActivityGoalUpdate state e
+        | ActivityNameUpdated e -> applyActivityNameUpdate state e
+        | TimeLogged e -> applyTimeLogged state e
+        | StartedLoggingTime e -> applyStartedLoggingTime state e
+        | EndedLoggingTime e -> applyEndedLoggingTime state e
+        | ActivityDeleted e -> applyActivityDeleted state e
+        | _ -> state
+        |> Some
 
-
+let activityAggregate: Aggregate<_, _, _> = {
+    Zero = None
+    Apply = apply
+    Exec = exec
+}

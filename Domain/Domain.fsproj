@@ -5,8 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Activity.fs" />
         <Compile Include="Aggregate.fs" />
+        <Compile Include="Activity.fs" />
         <Compile Include="Library.fs" />
         <Compile Include="User.fs" />
     </ItemGroup>
