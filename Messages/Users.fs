@@ -78,6 +78,6 @@ type UserDeleted =
 type UserEvent =
     | UserCreated of UserCreated
     | NameUpdated of NameUpdated
-    | UsernameUpdate of UsernameUpdated
+    | UsernameUpdated of UsernameUpdated
     | EmailUpdated of EmailUpdated
-    | UserDelete of UserDeleted
+    | UserDeleted of UserDeleted

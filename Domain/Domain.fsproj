@@ -8,6 +8,7 @@
         <Compile Include="Activity.fs" />
         <Compile Include="Aggregate.fs" />
         <Compile Include="Library.fs" />
+        <Compile Include="User.fs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -15,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Library\Library.fsproj" />
       <ProjectReference Include="..\Messages\Messages.fsproj" />
     </ItemGroup>
 

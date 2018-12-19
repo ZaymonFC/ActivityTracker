@@ -25,7 +25,21 @@ This is an attempt to learn to develop a functional paradigm application using e
 - Change goal or change name
 **User** *updates* **User**
 
-### Create the contracts
-**Turn behaviours into commands and events (code)**
+### Activity Aggregate
+#### Commands
+- CreateActivity
+- UpdateActivityGoal
+- UpdateActivityName
+- LogTime
+- StartTimeLogging
+- EndTimeLogging
+- DeleteActivity
 
-### Determine the business rules
+#### Events
+- ActivityCreated
+- ActivityGoalUpdated
+- ActivityNameUpdated
+- TimeLogged
+- StartedLoggingTime
+- EndedLoggingTime
+- ActivityDeleted
