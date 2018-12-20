@@ -83,3 +83,38 @@ let ``UpdateName command emits correct event`` () =
     
     Assert.Equal(expectedEvent, event)
     
+    
+    
+[<Fact>]
+let ``ErrorInvalidCommand when trying to issue a command and state has not been initialised`` () =
+    // Given
+    let events = []
+    let state = hydrate activityAggregate events
+    
+    Assert.Equal(None, state)
+    
+    // When
+    let command = UpdateActivityName {
+        Name = "Something Else"
+        UpdateAt = Instant.MaxValue
+    }
+    let event = run activityAggregate state command
+    
+    // Then 
+    match event with
+    | ErrorInvalidCommand _ -> ()
+    | _ -> failwithf "Event was not the correct type. Actual Event: %A" event
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
