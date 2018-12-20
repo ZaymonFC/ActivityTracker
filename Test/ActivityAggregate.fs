@@ -1,30 +1,17 @@
 module Tests
 
-open Domain.Aggregate
-open Domain.Activity
 open Messages.Activities
 open NodaTime
-open System
 open Xunit
-
-
-let createLoader (events: ActivityEvent seq) =
-    fun (id: Id) -> events
-    
-let createEventVerifier (expected: ActivityEvent) =
-    fun (id: Id * int) (actual: ActivityEvent) ->
-        Assert.Equal(expected, actual)
-
-let activityAggregateTestRunner load commit command =
-    let aggregateExecutor = MakeAggregateExecutor activityAggregate load commit
-    aggregateExecutor (Guid.NewGuid (), 10) command
+open Test.AggregateTestUtilities
+open Domain.Activity
 
 
 [<Fact>]
 let ``CreateActivity command emits correct event`` () =
     // Given
     let events = []
-    let load = createLoader events
+    let state = hydrate activityAggregate events
     
     // When
     let command = CreateActivity {
@@ -33,6 +20,8 @@ let ``CreateActivity command emits correct event`` () =
         Goal = Duration.FromHours 10
     }
     
+    let event = run activityAggregate state command
+    
     // Then
     let expectedEvent = ActivityCreated {
             Name = "New Activity"
@@ -40,7 +29,6 @@ let ``CreateActivity command emits correct event`` () =
             Goal = Duration.FromHours 10
         }
 
-    let commit = createEventVerifier expectedEvent    
-    activityAggregateTestRunner load commit command
+    Assert.Equal(expectedEvent, event)
 
 
