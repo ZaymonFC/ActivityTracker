@@ -52,7 +52,7 @@ let applyActivityGoalUpdate (state: ActivityState) (event: ActivityGoalUpdated) 
 let execUpdateName (state: ActivityState) (command: UpdateActivityName) =
     ActivityNameUpdated {
         Name = command.Name
-        UpdatedAt = command.UpdatedAt
+        UpdatedAt = command.UpdateAt
     }
     
 let applyActivityNameUpdate (state: ActivityState) (event: ActivityNameUpdated) =

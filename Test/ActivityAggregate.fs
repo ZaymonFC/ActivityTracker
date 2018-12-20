@@ -6,6 +6,13 @@ open Xunit
 open Test.AggregateTestUtilities
 open Domain.Activity
 
+let generateBaseEvents =
+    let create = ActivityCreated {
+        Name = "Activity"
+        Goal = Duration.MaxValue
+        CreatedAt = Instant.MinValue
+    }
+    [create]
 
 [<Fact>]
 let ``CreateActivity command emits correct event`` () =
@@ -32,3 +39,47 @@ let ``CreateActivity command emits correct event`` () =
     Assert.Equal(expectedEvent, event)
 
 
+[<Fact>]
+let ``UpdateGoal command emits correct event`` () =
+    // Given
+    let events = generateBaseEvents
+    let state = hydrate activityAggregate events
+    
+    // When
+    let command = UpdateActivityGoal {
+        Goal = Duration.Zero
+        UpdateAt = Instant.MaxValue
+    }
+    
+    let event = run activityAggregate state command
+    
+    // Then
+    let expectedEvent = ActivityGoalUpdated {
+        Goal = Duration.Zero
+        UpdatedAt = Instant.MaxValue
+    }
+    
+    Assert.Equal(expectedEvent, event)
+    
+[<Fact>]
+let ``UpdateName command emits correct event`` () =
+    // Given
+    let events = generateBaseEvents
+    let state = hydrate activityAggregate events
+    
+    // When
+    let command = UpdateActivityName {
+        Name = "Something Else"
+        UpdateAt = Instant.MaxValue
+    }
+    
+    let event = run activityAggregate state command
+    
+    // Then
+    let expectedEvent = ActivityNameUpdated {
+        Name = "Something Else"
+        UpdatedAt = Instant.MaxValue
+    }
+    
+    Assert.Equal(expectedEvent, event)
+    

@@ -18,7 +18,7 @@ type UpdateActivityGoal =
 type UpdateActivityName =
     {
         Name: string
-        UpdatedAt: Instant
+        UpdateAt: Instant
     }
 
 type LogTime =
