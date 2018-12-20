@@ -92,6 +92,11 @@ type ActivityDeleted =
         DeletedAt: Instant
     }
 
+type ErrorInvalidCommand =
+    {
+        Details: string
+    }
+
 type ActivityEvent =
     | ActivityCreated of ActivityCreated
     | ActivityGoalUpdated of ActivityGoalUpdated
@@ -100,3 +105,4 @@ type ActivityEvent =
     | StartedLoggingTime of StartedLoggingTime
     | EndedLoggingTime of EndedLoggingTime
     | ActivityDeleted of ActivityDeleted
+    | ErrorInvalidCommand of ErrorInvalidCommand

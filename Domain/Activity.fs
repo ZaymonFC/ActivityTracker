@@ -1,5 +1,6 @@
 module Domain.Activity
 
+open System
 open Library.OptionExtensions
 open Messages.Activities
 open NodaTime
@@ -116,16 +117,24 @@ let applyActivityDeleted (state: ActivityState) (event: ActivityDeleted) =
         DeletedAt = Some event.DeletedAt
     }
 
+let execErrorActivityDeleted (command: ActivityCommand) =
+    ErrorInvalidCommand {
+        Details = sprintf "Reason: %ACannot execute command on deleted activity. %ACommand: %A"
+                      Environment.NewLine Environment.NewLine command
+    }
+
 
 let exec (state: ActivityState option) (command: ActivityCommand) =
     match state with
     | None ->
         match command with
         | CreateActivity c -> execActivityCreate c
-        | _ -> failwithf "Attempted to fire %A with non-existent activity state" command
+        | _ -> ErrorInvalidCommand {
+                Details = sprintf "Attempted to fire %A with non-existent activity state" command
+            }
     | Some state ->
         match state.Deleted with
-        | true -> failwith "Cannot command deleted activity"
+        | true -> execErrorActivityDeleted command
         | _ ->
             match command with
             | UpdateActivityGoal c -> execUpdateGoal state c
@@ -134,7 +143,9 @@ let exec (state: ActivityState option) (command: ActivityCommand) =
             | StartTimeLogging c -> execStartTimeLogging state c
             | EndTimeLogging c -> execEndTimeLogging state c
             | DeleteActivity c -> execActivityDelete state c
-            | _ -> failwithf "The command %A is not applicable in this context" command
+            | _ -> ErrorInvalidCommand {
+                    Details = sprintf "The command %A is not applicable in this context" command
+                } 
 
 let apply (state: ActivityState option) (event: ActivityEvent) =
     match state with
