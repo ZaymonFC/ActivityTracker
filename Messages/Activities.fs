@@ -106,3 +106,4 @@ type ActivityEvent =
     | EndedLoggingTime of EndedLoggingTime
     | ActivityDeleted of ActivityDeleted
     | ErrorInvalidCommand of ErrorInvalidCommand
+    

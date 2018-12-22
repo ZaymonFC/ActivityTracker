@@ -107,8 +107,32 @@ let ``ErrorInvalidCommand when trying to issue a command and state has not been 
 
 
 
-
-
+[<Fact>]
+let ``ErrorInvalidCommand when trying to issue a command to a deleted activity`` () =
+    // Given
+    let events = generateBaseEvents
+    let deletedEvent = ActivityDeleted {
+        DeletedAt = Instant.MaxValue
+    }
+    let events = events @ [deletedEvent]
+    
+    let state = hydrate activityAggregate events
+    
+    // When
+    let command = UpdateActivityGoal {
+        Goal = Duration.MaxValue
+        UpdateAt = Instant.MaxValue
+    }
+    let event = run activityAggregate state command
+    
+    // Then
+    match event with
+    | ErrorInvalidCommand _ -> ()
+    | _ -> failwithf "Event was not correct type. Actual Event: %A" event
+    
+    
+    
+    
 
 
 
