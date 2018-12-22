@@ -96,6 +96,11 @@ type ErrorInvalidCommand =
     {
         Details: string
     }
+    
+type DomainRuleViolated =
+    {
+        Details: string
+    }
 
 type ActivityEvent =
     | ActivityCreated of ActivityCreated
@@ -106,4 +111,5 @@ type ActivityEvent =
     | EndedLoggingTime of EndedLoggingTime
     | ActivityDeleted of ActivityDeleted
     | ErrorInvalidCommand of ErrorInvalidCommand
+    | DomainRuleViolated of DomainRuleViolated
     

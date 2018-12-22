@@ -19,4 +19,3 @@ let MakeAggregateExecutor (aggregate: Aggregate<'TState, 'TCommand, 'TEvent>) (l
         event |> aggregate.Apply state |> ignore 
         
         event |> commit (streamId, version)
-        

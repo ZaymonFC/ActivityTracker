@@ -131,8 +131,47 @@ let ``ErrorInvalidCommand when trying to issue a command to a deleted activity``
     | _ -> failwithf "Event was not correct type. Actual Event: %A" event
     
     
+[<Fact>]
+let ``Domain Rule Violated when trying to stop time logging without a corresponding start event`` () =
+    // Given
+    let events = generateBaseEvents
+    let state = hydrate activityAggregate events
     
+    // When
+    let command = EndTimeLogging {
+        EndAt = Instant.MaxValue
+    }
+    let event = run activityAggregate state command
     
+    // Then
+    match event with
+    | DomainRuleViolated e ->
+        Assert.Contains("Cannot finalize", e.Details)
+    | _ -> failwithf "Event was not correct type. Actual Event: %A" event
+
+
+[<Fact>]
+let ``Domain Rule Violated when end time logging is before `` () =
+    // Given
+    let events = generateBaseEvents
+    
+    let events = events @ [StartedLoggingTime {
+        StartedAt = Instant.FromUnixTimeSeconds 10000L
+    }]
+    
+    let state = hydrate activityAggregate events
+    
+    // When
+    let command = EndTimeLogging {
+        EndAt = Instant.FromUnixTimeSeconds 100L
+    }
+    let event = run activityAggregate state command
+    
+    // Then
+    match event with
+    | DomainRuleViolated e ->
+        Assert.Contains("before logging started", e.Details)
+    | _ -> failwithf "Event was not correct type. Actual Event: %A" event
 
 
 

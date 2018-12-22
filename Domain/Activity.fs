@@ -1,6 +1,7 @@
 module Domain.Activity
 
 open System
+open System
 open Library.OptionExtensions
 open Messages.Activities
 open NodaTime
@@ -88,10 +89,15 @@ let applyStartedLoggingTime (state: ActivityState) (event: StartedLoggingTime) =
 // End Time Logging
 let execEndTimeLogging (state: ActivityState) (command: EndTimeLogging) =
     match state.StartedLoggingAt with
-    | None -> failwith "Cannot finish logging time when logging never started." // TODO - Emit error event
+    | None -> DomainRuleViolated {
+            Details = "Cannot finalize time logging without a corresponding start logging event"
+        }
     | Some s ->
-        if command.EndAt.InUtc().Second - s.InUtc().Second < 0 then
-            failwith "Error -ve duration" // TODO - Emit error event
+        if command.EndAt.ToUnixTimeMilliseconds() < s.ToUnixTimeMilliseconds() then
+            DomainRuleViolated {
+                Details = sprintf "Time logging cannot finish at a time before logging started. Start time: %A %A End Time: %A"
+                            s Environment.NewLine command.EndAt
+            }
         else
             EndedLoggingTime {
                 EndedAt = command.EndAt
