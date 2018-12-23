@@ -132,7 +132,7 @@ let ``ErrorInvalidCommand when trying to issue a command to a deleted activity``
     
     
 [<Fact>]
-let ``Domain Rule Violated when trying to stop time logging without a corresponding start event`` () =
+let ``Domain Rule Violated when trying to stop time logging without a start event`` () =
     // Given
     let events = generateBaseEvents
     let state = hydrate activityAggregate events
@@ -151,7 +151,7 @@ let ``Domain Rule Violated when trying to stop time logging without a correspond
 
 
 [<Fact>]
-let ``Domain Rule Violated when end time logging is before `` () =
+let ``Domain Rule Violated when end time logging is before`` () =
     // Given
     let events = generateBaseEvents
     
