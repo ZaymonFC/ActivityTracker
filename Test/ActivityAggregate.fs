@@ -153,9 +153,9 @@ let ``Domain Rule Violated when trying to stop time logging without a start even
 [<Fact>]
 let ``Domain Rule Violated when end time logging is before`` () =
     // Given
-    let events = generateBaseEvents
+    let baseEvents = generateBaseEvents
     
-    let events = events @ [StartedLoggingTime {
+    let events = baseEvents @ [StartedLoggingTime {
         StartedAt = Instant.FromUnixTimeSeconds 10000L
     }]
     
@@ -173,11 +173,23 @@ let ``Domain Rule Violated when end time logging is before`` () =
         Assert.Contains("before logging started", e.Details)
     | _ -> failwithf "Event was not correct type. Actual Event: %A" event
 
+[<Fact>] 
+let ``End time logging results in correct event with precursor start time logging event`` () = 
+    // Given
+    let baseEvents = generateBaseEvents
 
+    let events = baseEvents @[StartedLoggingTime { 
+        StartedAt = Instant.FromUnixTimeSeconds 0L
+    }]
+    let state = hydrate activityAggregate events
 
+    // When
+    let command = EndTimeLogging {
+        EndAt = Instant.FromUnixTimeSeconds 1000L
+    }
+    let event = run activityAggregate state command
 
-
-
-
-
-    
+    // Then
+    match event with
+    | EndedLoggingTime _ -> ()
+    | _ -> failwithf "Event was not correct type. Actual Event: %A" event
