@@ -84,7 +84,6 @@ let ``UpdateName command emits correct event`` () =
     Assert.Equal(expectedEvent, event)
     
     
-    
 [<Fact>]
 let ``ErrorInvalidCommand when trying to issue a command and state has not been initialised`` () =
     // Given

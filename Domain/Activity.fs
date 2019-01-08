@@ -107,7 +107,7 @@ let applyEndedLoggingTime (state: ActivityState) (event: EndedLoggingTime) =
     let newTotal = optional {
         let! s = state.StartedLoggingAt
         let! t = state.TotalTime
-        return t + (event.EndedAt - s).Seconds
+        return t + (int32 (event.EndedAt - s).TotalSeconds)
     }
     { state with TotalTime = newTotal }
     
