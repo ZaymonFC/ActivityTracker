@@ -5,6 +5,7 @@ open NodaTime
 open Xunit
 open Test.AggregateTestUtilities
 open Domain.Activity
+open System
 
 let generateBaseEvents =
     let create = ActivityCreated {
@@ -191,4 +192,4 @@ let ``End time logging results in correct event with precursor start time loggin
     // Then
     match event with
     | EndedLoggingTime _ -> ()
-    | _ -> failwithf "Event was not correct type. Actual Event: %A" event
+    | _ -> failwithf "Event was expected to be EndLoggingTime. \n Actual Event: %A" event

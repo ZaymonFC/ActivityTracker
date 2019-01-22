@@ -10,7 +10,6 @@ open Domain.Aggregate
 type ActivityState = {
     Name: string
     Goal: Duration
-    TotalTime: int option
     CreatedAt: Instant
     Deleted: bool
     DeletedAt: Instant option
@@ -30,7 +29,6 @@ let applyActivityCreated (event: ActivityCreated) =
     {
         Name = event.Name
         Goal = event.Goal
-        TotalTime = Some 0
         CreatedAt = event.CreatedAt
         Deleted = false
         DeletedAt = None
@@ -70,11 +68,6 @@ let execLogTime (state: ActivityState) (command: LogTime) =
         DateLogged = command.LogAt
     }
 
-let applyTimeLogged (state: ActivityState) (event: TimeLogged) =
-    match state.TotalTime with
-    | None -> { state with TotalTime = Some event.Duration.Seconds }
-    | Some t -> { state with TotalTime = Some (t + event.Duration.Seconds)}
-
 // Start Time Logging
 let execStartTimeLogging (state: ActivityState) (command: StartTimeLogging) =
     StartedLoggingTime {
@@ -104,12 +97,9 @@ let execEndTimeLogging (state: ActivityState) (command: EndTimeLogging) =
             }
 
 let applyEndedLoggingTime (state: ActivityState) (event: EndedLoggingTime) =
-    let newTotal = optional {
-        let! s = state.StartedLoggingAt
-        let! t = state.TotalTime
-        return t + (int32 (event.EndedAt - s).TotalSeconds)
+    { state with
+        StartedLoggingAt = None  
     }
-    { state with TotalTime = newTotal }
     
 // Delete Activity
 let execActivityDelete (state: ActivityState) (command: DeleteActivity) =
@@ -163,7 +153,7 @@ let apply (state: ActivityState option) (event: ActivityEvent) =
         match event with
         | ActivityGoalUpdated e -> applyActivityGoalUpdate state e
         | ActivityNameUpdated e -> applyActivityNameUpdate state e
-        | TimeLogged e -> applyTimeLogged state e
+        | TimeLogged _ -> state
         | StartedLoggingTime e -> applyStartedLoggingTime state e
         | EndedLoggingTime e -> applyEndedLoggingTime state e
         | ActivityDeleted e -> applyActivityDeleted state e

@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <Compile Include="AggregateTestUtilities.fs" />
-        <Compile Include="ActivityAggregate.fs" />
+        <Compile Include="ActivityAggregateTests.fs" />
     </ItemGroup>
 
     <ItemGroup>
