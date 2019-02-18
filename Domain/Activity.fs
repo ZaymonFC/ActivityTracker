@@ -1,8 +1,6 @@
 module Domain.Activity
 
 open System
-open System
-open Library.OptionExtensions
 open Messages.Activities
 open NodaTime
 open Domain.Aggregate
@@ -24,7 +22,7 @@ let execActivityCreate (command: CreateActivity) =
          Goal = command.Goal
          CreatedAt = command.CreateAt
     }
-    
+
 let applyActivityCreated (event: ActivityCreated) =
     {
         Name = event.Name
@@ -42,7 +40,7 @@ let execUpdateGoal (state: ActivityState) (command: UpdateActivityGoal) =
         Goal = command.Goal
         UpdatedAt = command.UpdateAt
     }
-    
+
 let applyActivityGoalUpdate (state: ActivityState) (event: ActivityGoalUpdated) =
     { state with
         Goal = event.Goal
@@ -54,7 +52,7 @@ let execUpdateName (state: ActivityState) (command: UpdateActivityName) =
         Name = command.Name
         UpdatedAt = command.UpdateAt
     }
-    
+
 let applyActivityNameUpdate (state: ActivityState) (event: ActivityNameUpdated) =
     { state with
         Name = event.Name
@@ -73,7 +71,7 @@ let execStartTimeLogging (state: ActivityState) (command: StartTimeLogging) =
     StartedLoggingTime {
         StartedAt = command.StartAt
     }
-    
+
 let applyStartedLoggingTime (state: ActivityState) (event: StartedLoggingTime) =
     { state with
         StartedLoggingAt = Some event.StartedAt
@@ -98,9 +96,9 @@ let execEndTimeLogging (state: ActivityState) (command: EndTimeLogging) =
 
 let applyEndedLoggingTime (state: ActivityState) (event: EndedLoggingTime) =
     { state with
-        StartedLoggingAt = None  
+        StartedLoggingAt = None
     }
-    
+
 // Delete Activity
 let execActivityDelete (state: ActivityState) (command: DeleteActivity) =
     ActivityDeleted {
@@ -141,7 +139,7 @@ let exec (state: ActivityState option) (command: ActivityCommand) =
             | DeleteActivity c -> execActivityDelete state c
             | _ -> ErrorInvalidCommand {
                     Details = sprintf "The command %A is not applicable in this context" command
-                } 
+                }
 
 let apply (state: ActivityState option) (event: ActivityEvent) =
     match state with

@@ -1,9 +1,8 @@
 namespace Messages.Activities
-open System
 open NodaTime
 
 type CreateActivity =
-    { 
+    {
         Name: string
         CreateAt: Instant
         Goal: Duration
@@ -22,9 +21,9 @@ type UpdateActivityName =
     }
 
 type LogTime =
-    { 
+    {
         Duration: Duration
-        LogAt: Instant 
+        LogAt: Instant
     }
 
 type StartTimeLogging =
@@ -58,7 +57,7 @@ type ActivityCreated =
         Goal: Duration
         CreatedAt: Instant
     }
-    
+
 type ActivityGoalUpdated =
     {
         Goal: Duration
@@ -72,8 +71,8 @@ type ActivityNameUpdated =
     }
 
 type TimeLogged =
-    { 
-        Duration: Duration 
+    {
+        Duration: Duration
         DateLogged: Instant
     }
 
@@ -83,7 +82,7 @@ type StartedLoggingTime =
     }
 
 type EndedLoggingTime =
-    { 
+    {
         EndedAt: Instant
     }
 
@@ -96,7 +95,7 @@ type ErrorInvalidCommand =
     {
         Details: string
     }
-    
+
 type DomainRuleViolated =
     {
         Details: string
@@ -112,4 +111,3 @@ type ActivityEvent =
     | ActivityDeleted of ActivityDeleted
     | ErrorInvalidCommand of ErrorInvalidCommand
     | DomainRuleViolated of DomainRuleViolated
-    
