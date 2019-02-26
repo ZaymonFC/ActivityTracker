@@ -20,9 +20,9 @@ type UpdateName =
 type UpdateUsername =
     {
         Username: string
-        UpdateAt: string
+        UpdateAt: Instant
     }
-    
+
 type UpdateEmail =
     {
         Email: string
@@ -57,7 +57,7 @@ type NameUpdated =
         LastName: string
         UpdatedAt: Instant
     }
-    
+
 type UsernameUpdated =
     {
         Username: string
@@ -75,9 +75,21 @@ type UserDeleted =
         DeletedAt: Instant
     }
 
+type ErrorInvalidCommand =
+    {
+        Details: string
+    }
+
+type DomainRuleViolated =
+    {
+        Details: string
+    }
+
 type UserEvent =
     | UserCreated of UserCreated
     | NameUpdated of NameUpdated
     | UsernameUpdated of UsernameUpdated
     | EmailUpdated of EmailUpdated
     | UserDeleted of UserDeleted
+    | ErrorInvalidCommand of ErrorInvalidCommand
+    | DomainRuleViolated of DomainRuleViolated

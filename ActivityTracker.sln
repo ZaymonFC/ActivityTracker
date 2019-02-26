@@ -8,6 +8,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Test", "Test\Test.fsproj", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Library", "Library\Library.fsproj", "{B2B70693-CF34-4A1B-B053-9A68BDE89C98}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Web", "Web\Web.fsproj", "{136D060D-DCEC-498F-8ECE-8C7C919A868C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{B2B70693-CF34-4A1B-B053-9A68BDE89C98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2B70693-CF34-4A1B-B053-9A68BDE89C98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2B70693-CF34-4A1B-B053-9A68BDE89C98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{136D060D-DCEC-498F-8ECE-8C7C919A868C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{136D060D-DCEC-498F-8ECE-8C7C919A868C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{136D060D-DCEC-498F-8ECE-8C7C919A868C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{136D060D-DCEC-498F-8ECE-8C7C919A868C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
