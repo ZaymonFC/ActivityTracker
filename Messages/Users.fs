@@ -20,7 +20,7 @@ type UpdateName =
 type UpdateUsername =
     {
         Username: string
-        UpdateAt: string
+        UpdateAt: Instant
     }
 
 type UpdateEmail =

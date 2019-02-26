@@ -10,6 +10,7 @@ type UserState = {
     Username: string
     Email: string
     CreatedAt: Instant
+    Deleted: bool
 }
 
 let execCreateUser (command: CreateUser) =
@@ -28,6 +29,7 @@ let applyUserCreated (event: UserCreated) =
         Username = event.Username
         Email = event.Email
         CreatedAt = event.CreatedAt
+        Deleted = false
     }
 
 let execUpdateName (state: UserState) (command: UpdateName) =
@@ -45,22 +47,36 @@ let applyNameUpdated (state: UserState) (event: NameUpdated) =
     }
 
 let execUpdateUsername (state: UserState) (command: UpdateUsername) =
-    raise <| NotImplementedException ()
+    UsernameUpdated {
+        Username = command.Username
+        UpdatedAt = command.UpdateAt
+    }
 
 let applyUsernameUpdate (state: UserState) (event: UsernameUpdated) =
-    raise <| NotImplementedException ()
+    { state with
+        Username = event.Username
+    }
 
 let execUpdateEmail (state: UserState) (command: UpdateEmail) =
-    raise <| NotImplementedException ()
+    EmailUpdated {
+        Email = command.Email
+        UpdatedAt = command.UpdateAt
+    }
 
 let applyEmailUpdated (state: UserState) (event: EmailUpdated) =
-    raise <| NotImplementedException ()
+    { state with
+        Email = event.Email
+    }
 
 let execDeleteUser (state: UserState) (command: DeleteUser) =
-    raise <| NotImplementedException ()
+    UserDeleted {
+        DeletedAt = command.DeleteAt
+    }
 
-let applyUserDelete (state: UserState) (event: UserDeleted) =
-    raise <| NotImplementedException ()
+let applyUserDeleted (state: UserState) (event: UserDeleted) =
+    { state with
+        Deleted = true
+    }
 
 
 let exec (state: UserState option) (command: UserCommand) =
@@ -92,7 +108,7 @@ let apply (state: UserState option) (event: UserEvent) =
         | NameUpdated e -> applyNameUpdated state e
         | UsernameUpdated e -> applyUsernameUpdate state e
         | EmailUpdated e -> applyEmailUpdated state e
-        | UserDeleted e -> applyUserDelete state e
+        | UserDeleted e -> applyUserDeleted state e
         | _ -> state
         |> Some
 
